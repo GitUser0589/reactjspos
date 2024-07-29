@@ -9,7 +9,7 @@ function DataDisplay() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/product');
+        const response = await fetch('http://localhost:3000/psm_product');
         const data = await response.json();
         setProducts(data);
       } catch (error) {
