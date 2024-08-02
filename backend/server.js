@@ -12,7 +12,7 @@ const db = mysql.createConnection({
     password: 'OozB0bU1MPnubI',
     database: 'if0_36978277_ERM_DB'
 });
-
+ 
 app.get('/', (req, res) => {
     return res.json("from backend side");
 })

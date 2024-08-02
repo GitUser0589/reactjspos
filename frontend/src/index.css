@@ -1,9 +1,4 @@
-.table-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* Adjust height as needed */
-}
+
 
 table {
   border-collapse: collapse;
@@ -20,10 +15,4 @@ th, td {
 
 th {
   background-color: #f2f2f2;
-}
-.product-container {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 10px; /* Adjust spacing as needed */
-  display: inline-block; /* Adjust layout as needed */
 }

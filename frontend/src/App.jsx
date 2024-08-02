@@ -9,11 +9,15 @@ function DataDisplay() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/psm_product');
+        const response = await fetch('http://sql313.infinityfree.com/psm_product');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         const data = await response.json();
         setProducts(data);
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching data:', error);
+        // Optionally set some state to display an error message to users
       }
     };
 
@@ -45,10 +49,6 @@ function DataDisplay() {
     setCart(cart.filter((item) => item.id !== productId));
   };
 
-  const calculateTotal = () => {
-    return cart.reduce((total, item) => total + item.unit_price * item.quantity, 0);
-  };
-
   const handleBuy = () => {
     console.log('Purchase completed!');
     setCart([]);
@@ -57,13 +57,13 @@ function DataDisplay() {
   return (
     <div>
       <div className="product-list">
-        {products.map((product) => (
-          <div key={product.id} className="product-container">
-            <h2>{product.product_name}</h2>
-            <p>Desc: {product.description}</p>
-            <p>Stock: {product.stock_level}</p>
-            <p>Price: ${product.unit_price}</p>
-            <button onClick={() => addToCart(product)}>Add to Cart</button>
+        {products.map((psm_product) => (
+          <div key={psm_product.id} className="product-container">
+            <h2>{psm_product.product_name}</h2>
+            <p>Desc: {psm_product.description}</p>
+            <p>Stock: {psm_product.stock_level}</p>
+            <p>Price: ${psm_product.unit_price.toFixed(2)}</p>
+            <button onClick={() => addToCart(psm_product)}>Add to Cart</button>
           </div>
         ))}
       </div>
@@ -75,11 +75,11 @@ function DataDisplay() {
             {cart.map((item) => (
               <div key={item.id} className="cart-item">
                 <p>{item.product_name} (x{item.quantity})</p>
-                <p>Price: ${item.unit_price} x {item.quantity} = ${(item.unit_price * item.quantity).toFixed(2)}</p>
+                <p>Price: ${item.unit_price.toFixed(2)} x {item.quantity} = ${(item.unit_price * item.quantity).toFixed(2)}</p>
                 <button onClick={() => removeFromCart(item.id)}>Remove</button>
               </div>
             ))}
-            <p>Total: ${calculateTotal().toFixed(2)}</p>
+            <p>Total: ${total.toFixed(2)}</p>
             <button onClick={handleBuy}>Buy Now</button>
           </div>
         ) : (
