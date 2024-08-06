@@ -9,7 +9,7 @@ function DataDisplay() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://sql313.infinityfree.com/psm_product');
+        const response = await fetch('t');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

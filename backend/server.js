@@ -7,10 +7,10 @@ app.use(cors())
 const port =3000;
 
 const db = mysql.createConnection({
-    host: 'sql313.infinityfree.com',
-    user: 'if0_36978277',
-    password: 'OozB0bU1MPnubI',
-    database: 'if0_36978277_ERM_DB'
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'possys'
 });
  
 app.get('/', (req, res) => {
