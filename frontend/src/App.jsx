@@ -5,11 +5,13 @@ function DataDisplay() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  const [showNotification, setShowNotification] = useState(false);
+  const [receipt, setReceipt] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('t');
+        const response = await fetch('http://localhost:3000/product'); // Replace with your actual API URL
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -26,7 +28,7 @@ function DataDisplay() {
 
   useEffect(() => {
     const calculateTotal = () => {
-      setTotal(cart.reduce((acc, item) => acc + item.unit_price * item.quantity, 0));
+      setTotal(cart.reduce((acc, item) => acc + item.UnitPrice * item.quantity, 0));
     };
 
     calculateTotal();
@@ -51,19 +53,27 @@ function DataDisplay() {
 
   const handleBuy = () => {
     console.log('Purchase completed!');
-    setCart([]);
+    setReceipt(cart);  // Save the cart items as a receipt
+    setShowNotification(true);  // Show the purchase complete notification
+    setCart([]);  // Clear the cart after purchase
+
+    // Hide the notification after a few seconds
+    setTimeout(() => {
+      setShowNotification(false);
+      setReceipt([]);  // Clear the receipt after displaying
+    }, 5000); // Adjust the time as needed
   };
 
   return (
     <div>
       <div className="product-list">
-        {products.map((psm_product) => (
-          <div key={psm_product.id} className="product-container">
-            <h2>{psm_product.product_name}</h2>
-            <p>Desc: {psm_product.description}</p>
-            <p>Stock: {psm_product.stock_level}</p>
-            <p>Price: ${psm_product.unit_price.toFixed(2)}</p>
-            <button onClick={() => addToCart(psm_product)}>Add to Cart</button>
+        {products.map((product) => (
+          <div key={product.id} className="product-container">
+            <h2>{product.ProductName}</h2>
+            <p>Desc: {product.Description}</p>
+            <p>Stock: {product.StockLevel}</p>
+            <p>Price: ${product.UnitPrice.toFixed(2)}</p>
+            <button onClick={() => addToCart(product)}>Add to Cart</button>
           </div>
         ))}
       </div>
@@ -74,8 +84,8 @@ function DataDisplay() {
           <div>
             {cart.map((item) => (
               <div key={item.id} className="cart-item">
-                <p>{item.product_name} (x{item.quantity})</p>
-                <p>Price: ${item.unit_price.toFixed(2)} x {item.quantity} = ${(item.unit_price * item.quantity).toFixed(2)}</p>
+                <p>{item.ProductName} (x{item.quantity})</p>
+                <p>Price: ${item.UnitPrice.toFixed(2)} x {item.quantity} = ${(item.UnitPrice * item.quantity).toFixed(2)}</p>
                 <button onClick={() => removeFromCart(item.id)}>Remove</button>
               </div>
             ))}
@@ -86,6 +96,21 @@ function DataDisplay() {
           <p>Your cart is empty.</p>
         )}
       </div>
+
+      {showNotification && (
+        <div className="notification">
+          <h3>Purchase Complete!</h3>
+          <p>Thank you for your purchase. Here is your receipt:</p>
+          <ul>
+            {receipt.map((item) => (
+              <li key={item.id}>
+                {item.ProductName} - ${item.UnitPrice.toFixed(2)} x {item.quantity} = ${(item.UnitPrice * item.quantity).toFixed(2)}
+              </li>
+            ))}
+          </ul>
+          <p>Total: ${total.toFixed(2)}</p>
+        </div>
+      )}
     </div>
   );
 }
