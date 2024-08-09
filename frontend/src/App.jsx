@@ -5,11 +5,39 @@ function DataDisplay() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  const [notification, setNotification] = useState(''); // State for notification message
 
+  // Function to handle buying products
+  const handleBuy = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/update-stock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items: cart }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update stock');
+      }
+
+      console.log('Purchase completed!');
+      setCart([]);
+      setNotification('Thank you for your purchase!');
+      setTimeout(() => setNotification(''), 3000);
+    } catch (error) {
+      console.error('Error updating stock:', error);
+      setNotification('Failed to complete purchase. Please try again.');
+      setTimeout(() => setNotification(''), 3000);
+    }
+  };
+
+  // Fetch data from the server
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('t');
+        const response = await fetch('http://localhost:3000/psm_product');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -24,6 +52,7 @@ function DataDisplay() {
     fetchData();
   }, []);
 
+  // Calculate the total price of the cart
   useEffect(() => {
     const calculateTotal = () => {
       setTotal(cart.reduce((acc, item) => acc + item.unit_price * item.quantity, 0));
@@ -32,12 +61,13 @@ function DataDisplay() {
     calculateTotal();
   }, [cart]);
 
+  // Add item to the cart
   const addToCart = (product) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === psm_product.psm_product_ID);
+      const existingItem = prevCart.find((item) => item.psm_product_ID === product.psm_product_ID);
       if (existingItem) {
         return prevCart.map((item) =>
-          item.id === psm_product.psm_product_ID ? { ...item, quantity: item.quantity + 1 } : item
+          item.psm_product_ID === product.psm_product_ID ? { ...item, quantity: item.quantity + 1 } : item
         );
       } else {
         return [...prevCart, { ...product, quantity: 1 }];
@@ -45,13 +75,9 @@ function DataDisplay() {
     });
   };
 
+  // Remove item from the cart
   const removeFromCart = (productId) => {
-    setCart(cart.filter((item) => item.id !== productId));
-  };
-
-  const handleBuy = () => {
-    console.log('Purchase completed!');
-    setCart([]);
+    setCart(cart.filter((item) => item.psm_product_ID !== productId));
   };
 
   return (
@@ -73,10 +99,13 @@ function DataDisplay() {
         {cart.length > 0 ? (
           <div>
             {cart.map((item) => (
-              <div key={item.id} className="cart-item">
+              <div key={item.psm_product_ID} className="cart-item">
                 <p>{item.product_name} (x{item.quantity})</p>
-                <p>Price: ${item.unit_price.toFixed(2)} x {item.quantity} = ${(item.unit_price * item.quantity).toFixed(2)}</p>
-                <button onClick={() => removeFromCart(item.id)}>Remove</button>
+                <p>
+                  Price: ${item.unit_price.toFixed(2)} x {item.quantity} = $
+                  {(item.unit_price * item.quantity).toFixed(2)}
+                </p>
+                <button onClick={() => removeFromCart(item.psm_product_ID)}>Remove</button>
               </div>
             ))}
             <p>Total: ${total.toFixed(2)}</p>
@@ -86,6 +115,8 @@ function DataDisplay() {
           <p>Your cart is empty.</p>
         )}
       </div>
+
+      {notification && <div className="notification">{notification}</div>} {/* Display notification */}
     </div>
   );
 }
